@@ -5,9 +5,9 @@ import oracledb from "oracledb";
   
     try {
       connection = await oracledb.getConnection({
-        user: 'API',
-        password: 'api',
-        connectString: "localhost/XEPDB1"
+        user: process.env.DB_CONNECTION_USER ,
+        password: process.env.DB_CONNECTION_PASSWORD,
+        connectString: process.env.DB_CONNECTION_STRING
       });
   
       console.log('Conexão com o banco de dados estabelecida com sucesso.');
