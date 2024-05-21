@@ -30,7 +30,7 @@ import oracledb from "oracledb";
                                                     SELECT * 
                                                     FROM MOVIES M 
                                                     INNER JOIN Media MD ON M.MOVIEID = MD.MEDIAID 
-                                                    WHERE MD.MEDIATYPE = 'Movie'`);
+                                                    WHERE MD.MEDIATYPE = 'Serie'`);
 
             if (result.rows.length > 0) {
                 res.status(200).json(result.rows[0]);
@@ -57,7 +57,7 @@ import oracledb from "oracledb";
         let connection;
         try {
             connection = await conectar();
-            const result = await connection.execute(`SELECT * FROM media WHERE trim(UPPER(title)) = UPPER(:title)`, [title]);
+            const result = await connection.execute(`SELECT * FROM media WHERE trim(UPPER(title)) = UPPER(:title) AND MEDIATYPE = 'Serie'`, [title]);
             
             if (result.rows.length > 0) {
                 res.status(200).json(result.rows[0]);
