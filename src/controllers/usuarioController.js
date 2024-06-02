@@ -37,6 +37,19 @@ function transformarRetorno(lista) {
     return objeto;
 }
 
+function transformarUsuarioRetorno(lista) {
+    let objeto = lista.map(element => {
+        return {     
+            "userId": element[0],
+            "userName": element[1],
+            "email": element[3],
+            "dateJoined": element[4]
+        };
+    });
+
+    return objeto;
+}
+
 
 class UsuarioController {
 
@@ -75,14 +88,15 @@ class UsuarioController {
                      secret,
                     { expiresIn: '168h' }
                     );
-                    res.status(200).json({ message: 'Login bem-sucedido!', user, msg:'Autenticação realizada com sucesso', token});
+                   res.status(200).json({ message: 'Login bem-sucedido!', user, msg:'Autenticação realizada com sucesso', token});
+                    // res.status(200).json({ success: true, user/*, token*/ });
                     console.log(user);
                 } else {
                     res.status(401).json({ message: 'Usuário ou senha incorretos'});
                 }
             } 
             else {
-                res.status(401).json({ message: 'Usuário não encontrado' });
+                res.status(401).json({ userFound: false });
             }
            
         } catch (error) {
@@ -132,6 +146,57 @@ class UsuarioController {
         } catch (error) {
             console.error('Erro:', error);
             res.status(500).json({ message: 'Erro ao cadastrar o usuário',error });
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    };
+
+    static async listarUsuarios (req, res) {
+        let connection;
+        connection = await conectar();
+
+        try {
+            const result = await connection.execute(`
+            SELECT * 
+            FROM TABLE_USERS `);  
+
+            const obj = transformarUsuarioRetorno(result.rows);
+            console.log(obj);
+            res.status(200).json(obj);
+        } catch (error) {
+            res.status(400).json({ message: `${error.message}` });
+        } finally {
+            if (connection) {
+                try {
+                    await connection.close();
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        }
+    };
+
+    static async listarUsuariosPorId(req, res) {
+        let connection;
+        let id = req.query.id;
+        connection = await conectar();
+
+        try {
+            const result = await connection.execute(`
+            SELECT * 
+            FROM TABLE_USERS WHERE ID = :id`, [{id}]);  
+
+            const obj = transformarUsuarioRetorno(result.rows);
+            console.log(obj);
+            res.status(200).json(obj);
+        } catch (error) {
+            res.status(400).json({ message: `${error.message}` });
         } finally {
             if (connection) {
                 try {

@@ -28,9 +28,9 @@ import oracledb from "oracledb";
             connection = await conectar();
             const result = await connection.execute(`
                                                     SELECT * 
-                                                    FROM MOVIES M 
-                                                    INNER JOIN Media MD ON M.MOVIEID = MD.MEDIAID 
-                                                    WHERE MD.MEDIATYPE = 'Serie'`);
+                                                    FROM SERIES S 
+                                                    INNER JOIN Media MD ON S.SERIESID = MD.MEDIAID 
+                                                    WHERE MD.MEDIATYPE = 'Series'`);
 
             if (result.rows.length > 0) {
                 res.status(200).json(result.rows[0]);
@@ -57,8 +57,8 @@ import oracledb from "oracledb";
         let connection;
         try {
             connection = await conectar();
-            const result = await connection.execute(`SELECT * FROM media WHERE trim(UPPER(title)) = UPPER(:title) AND MEDIATYPE = 'Serie'`, [title]);
-            
+            const result = await connection.execute(`SELECT * FROM media WHERE UPPER(title) LIKE UPPER(:title)`, [`%${title}%`]);
+                                                    
             if (result.rows.length > 0) {
                 res.status(200).json(result.rows[0]);
             } else {
